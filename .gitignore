@@ -1,0 +1,6 @@
+*.nc
+*.npy
+.ipynb_checkpoints
+*.pdf
+*.png
+.vscode/*
