@@ -9,10 +9,10 @@ Uses identified event output plots to categorise into groups.
 #### environment.yaml
 Example keras env for categorise_imgs script.
 
-####plot_grouped_events.ipynb
+#### plot_grouped_events.ipynb
 Plotting clustered events (after running categorisation script)
 
-####rx5day_clim_identify.py
+#### rx5day_clim_identify.py
 Full rx5day identifying events script.
 
 #### precip_identify.py
