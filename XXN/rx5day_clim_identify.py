@@ -54,10 +54,16 @@ regions = {'SA': [5,35,65,95],
            'EA' : [20,53,95,133],
            'NA' : [25,70,-150,-45],
            'EU' : [35,70,-20,45],
-           'NO' : [53,72,0,32]}
+           'NO' : [53,72,0,32],
+           'NO_ext': [50,80,-30,37]}
 
 #selects lat lon bounds for region
 lat_min, lat_max, lon_min, lon_max = regions[region_label]
+
+lat_min_p, lat_max_p, lon_min_p, lon_max_p = regions['NO_ext']
+
+#using subregion to identify events?
+subregion = False
 
 # %%
 var_filepath = f"{file_loc}/{exp_name}/{var_filelab}"
@@ -133,6 +139,26 @@ land_mask = land_percent_data.mask
 ensemble_array_m = ensemble_array.where(land_mask)
 print('land mask done')
 
+#Make mask for subregion to identify events
+#set bounds in lat and lon mins below
+#this breaks if only one lat/lon is selected
+
+if subregion == True:
+    #Make regional mask
+    lon_min_reg = 4
+    lon_max_reg = 8
+    lat_min_reg = 59
+    lat_max_reg = 64
+    
+    ensemble_array_m = ensemble_array_m.sel(lon=slice(lon_min_reg, lon_max_reg), lat=slice(lat_min_reg, lat_max_reg))
+    print('masked subregion')
+
+elif subregion == False:
+    print(f'subregion=False, using {region_label} area to identify events')
+    
+else:
+    print('check subregion variable')
+
 
 # ### Calculate 5day sum and climatology
 
@@ -154,6 +180,7 @@ ds_climo['std_monthly'] = ensemble_array_m['rx5day'].sel(time=slice('2015-01-01'
 #ds_anoms['std'] = ds_anoms['rx5day'].std(dim=('member','time'))
 ds_climo['sigma_level'] = sigma_level * ds_climo['std_monthly']
 
+#ds_climo.to_netcdf(f'{output_write}/{region_label}_{exp_name}_{var_name}_climo_sigma{sigma_lab}.nc')
 
 # %%
 # ### Count how many times 3sigma and 5sigma are exceeded in each gridbox
@@ -376,8 +403,4 @@ for n,time_ind in enumerate(events_array.time_ind):
     #plt.title(f'r{member_ind+1} {time_lab}',fontsize=16)
     axis.coastlines(linewidth=0.5)  # cartopy function
     fig.savefig(f'{out_plots}/PRECT5day_{sigma_lab}_r{member_ind+1}_{time_lab[:10]}_{lat_lab}_{lon_lab}_contour.png', format='png', bbox_inches='tight')
-
-# %%
-
-
 
